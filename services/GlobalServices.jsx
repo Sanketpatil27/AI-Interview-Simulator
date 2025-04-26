@@ -13,7 +13,7 @@ const openai = new OpenAI({
     dangerouslyAllowBrowser: true,
 })
 
-export const AIModel = async (topic, coachingOption, msg) => {
+export const AIModel = async (topic, coachingOption, lastTwoConversation) => {
 
     const option = CoachingOptions.find((item) => item.name === coachingOption);
     const PROMPT = (option.prompt).replace('{user_topic}', topic);
@@ -22,8 +22,9 @@ export const AIModel = async (topic, coachingOption, msg) => {
         model: "google/gemini-2.0-flash-exp:free",
         messages: [
             { role: 'assistant', content: PROMPT },
-            { role: "user", content: msg }
+            ...lastTwoConversation
         ],
     })
     console.log(completion.choices[0].message)
+    return completion.choices[0].message;
 }

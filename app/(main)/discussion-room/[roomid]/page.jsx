@@ -12,6 +12,7 @@ import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useParams } from 'next/navigation'
 import React, { useEffect, useRef, useState } from 'react'
+import ChatBox from './_components/ChatBox';
 // const RecordRTC = dynamic(() => import("recordrtc"), { ssr: false });
 let RecordRTC;
 if (typeof window !== "undefined") {
@@ -30,7 +31,13 @@ function DiscussRoom() {
     const recorder = useRef(null);
     const realtimeTranscriber = useRef(null);
     const [transcribe, setTranscribe] = useState('');
-    const [conversation, setConversation] = useState([]);
+    const [conversation, setConversation] = useState([{
+        role: 'assistant',
+        content: "Hi",
+    }, {
+        role: 'user',
+        content: 'Hello'
+    }]);
     const [loading, setLoading] = useState(false);
     let silenceTimeout;
     let texts = {};
@@ -54,7 +61,7 @@ function DiscussRoom() {
         })
 
         realtimeTranscriber.current.on('transcript', async (transcript) => {
-            console.log(transcript);
+            // console.log(transcript);
             let msg = '';
 
             if (transcript.message_type === 'FinalTranscript') {
@@ -64,10 +71,11 @@ function DiscussRoom() {
                 }]);
 
                 // Calling AI text model to get response
+                const lastTwoMsg = conversation.slice(-2)
                 const aiResp = await AIModel(
                     DiscussionRoomData.topic,
                     DiscussionRoomData.coachingOption,
-                    transcript.text
+                    lastTwoMsg
                 )
 
                 console.log(aiResp);
@@ -168,11 +176,9 @@ function DiscussRoom() {
                         }
                     </div>
                 </div>
+
                 <div>
-                    <div className='h-[60vh] bg-secondary border rounded-4xl flex flex-col items-center justify-center relative'>
-                        <h2>Transcript</h2>
-                    </div>
-                    <h2 className='mt-4 text-gray-400 text-sm'> At the end of your conversion we will automatically generate feedback from your conversation </h2>
+                    <ChatBox conversation={conversation} />
                 </div>
             </div>
 
