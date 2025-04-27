@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { api } from '@/convex/_generated/api';
-import { AIModel, getToken } from '@/services/GlobalServices';
+import { AIModel, ConvertTextToSpeech, getToken } from '@/services/GlobalServices';
 import { CoachingExpert } from '@/services/Options';
 import { UserButton } from '@stackframe/stack';
 import { RealtimeTranscriber } from 'assemblyai';
@@ -31,6 +31,8 @@ function DiscussRoom() {
     const recorder = useRef(null);
     const realtimeTranscriber = useRef(null);
     const [transcribe, setTranscribe] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [audioUrl, setAudioUrl] = useState()
     const [conversation, setConversation] = useState([{
         role: 'assistant',
         content: "Hi",
@@ -38,7 +40,6 @@ function DiscussRoom() {
         role: 'user',
         content: 'Hello'
     }]);
-    const [loading, setLoading] = useState(false);
     let silenceTimeout;
     let texts = {};
 
@@ -78,7 +79,9 @@ function DiscussRoom() {
                     lastTwoMsg
                 )
 
-                console.log(aiResp);
+                const url = await ConvertTextToSpeech(aiResp.content, DiscussionRoomData.expertName);
+                console.log("url: ", url);
+                setAudioUrl(url);
                 setConversation(prev => [...prev, aiResp])
             }
 
@@ -161,6 +164,8 @@ function DiscussRoom() {
                         />
 
                         <h2 className='text-gray-500'> {expert?.name} </h2>
+                        <audio src={audioUrl} type="audio/mp3" autoPlay />
+
                         <div className='p-4 bg-gray-200 px-10 rounded-lg absolute bottom-10 right-10'>
                             <UserButton />
                         </div>
