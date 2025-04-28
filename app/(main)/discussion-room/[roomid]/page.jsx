@@ -6,7 +6,7 @@ import { AIModel, ConvertTextToSpeech, getToken } from '@/services/GlobalService
 import { CoachingExpert } from '@/services/Options';
 import { UserButton } from '@stackframe/stack';
 import { RealtimeTranscriber } from 'assemblyai';
-import { useQuery } from 'convex/react';
+import { useMutation, useQuery } from 'convex/react';
 import { Loader2Icon } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
@@ -33,6 +33,7 @@ function DiscussRoom() {
     const [transcribe, setTranscribe] = useState('');
     const [loading, setLoading] = useState(false);
     const [audioUrl, setAudioUrl] = useState()
+    const UpdateConversation = useMutation(api.DiscussionRoom.UpdateConversation)
     const [conversation, setConversation] = useState([{
         role: 'assistant',
         content: "Hi",
@@ -149,6 +150,11 @@ function DiscussRoom() {
         recorder.current.pauseRecording();
         recorder.current = null;
         setEnableMic(false);
+
+        await UpdateConversation({
+            id: DiscussionRoomData._id,
+            conversation: conversation
+        })
         setLoading(false);
     }
 

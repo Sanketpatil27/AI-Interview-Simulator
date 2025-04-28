@@ -6,10 +6,10 @@ export const CreateNewRoom = mutation({
         coachingOption: v.string(),
         topic: v.string(),
         expertName: v.string(),
-    }, 
-    handler: async(ctx, args) => {
+    },
+    handler: async (ctx, args) => {
         const result = await ctx.db.insert('DiscussionRoom', {
-            coachingOption: args.coachingOption, 
+            coachingOption: args.coachingOption,
             topic: args.topic,
             expertName: args.expertName
         });
@@ -21,9 +21,21 @@ export const CreateNewRoom = mutation({
 export const GetDiscussionRoom = query({
     args: {
         id: v.id('DiscussionRoom')
-    }, 
-    handler: async(ctx, args) => {
+    },
+    handler: async (ctx, args) => {
         const result = await ctx.db.get(args.id);
         return result;
+    }
+})
+
+export const UpdateConversation = mutation({
+    args: {
+        id: v.id('DiscussionRoom'),
+        conversation: v.any()
+    },
+    handler: async (ctx, args) => {
+        await ctx.db.patch(args.id, {
+            conversation: args.conversation
+        })
     }
 })
