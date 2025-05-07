@@ -19,15 +19,68 @@ export const AIModel = async (topic, coachingOption, lastTwoConversation) => {
     const option = CoachingOptions.find((item) => item.name === coachingOption);
     const PROMPT = (option.prompt).replace('{user_topic}', topic);
 
+    // Check if there's any previous conversation
+    // if (lastTwoConversation && lastTwoConversation.length > 0) {
+    //     // If there's history, we'll use a slightly different prompt
+    //     // that focuses on continuing the conversation.
+    //     PROMPT = `Continue the interview based on the previous turns. The user's topic is: ${topic}.`;
+    // }
+
     const completion = await openai.chat.completions.create({
-        model: "google/gemini-2.0-flash-exp:free",
+        model: "google/gemma-3-1b-it:free",
         messages: [
             { role: 'assistant', content: PROMPT },
             ...lastTwoConversation
         ],
     })
-    console.log(completion.choices[0].message)
-    return completion.choices[0].message;
+
+    // console.log(completion.choices[0].message)
+    // return completion.choices[0].message;
+
+    // if (completion?.error) {
+    //     if (completion.error.code === 429) {
+    //         return {
+    //             role: 'assistant',
+    //             content: "We're currently at capacity. Please try again in a few hours."
+    //         };
+    //     }
+    
+    //     console.error('OpenRouter API Error:', completion.error);
+    //     return {
+    //         role: 'assistant',
+    //         content: "Sorry, an error occurred. Please try again later."
+    //     };
+    // }
+    
+
+    if (completion?.choices?.[0]?.message) {
+        return completion.choices[0].message;
+    } else {
+        console.error('Invalid AI response:', completion);
+        return { role: 'assistant', content: "Sorry, I couldn't get a proper response. Please try again!" };
+    }
+
+}
+
+export const AIModelToGenerateFeedbackAndNotes = async (coachingOption, conversation) => {
+
+    const option = CoachingOptions.find((item) => item.name === coachingOption);
+    const PROMPT = (option.summeryPrompt)
+
+    console.log("conversation: ", conversation);
+
+    const completion = await openai.chat.completions.create({
+        model: "google/gemma-3-1b-it:free",
+        messages: [
+            ...conversation,
+            { role: 'user', content: PROMPT },
+        ],
+    })
+
+    // 3.24.000 ------------------------
+
+    console.log("completion[0]: ", completion.choices[0].message)
+    return completion?.choices[0].message;
 }
 
 export const ConvertTextToSpeech = async (text, expertName) => {
@@ -48,7 +101,7 @@ export const ConvertTextToSpeech = async (text, expertName) => {
     try {
         const { AudioStream } = await pollyClient.send(command)
         const audioArrayBuffer = await AudioStream.transformToByteArray();
-        const audioBlob = new Blob([audioArrayBuffer] ,{type: 'audio/mp3'})
+        const audioBlob = new Blob([audioArrayBuffer], { type: 'audio/mp3' })
 
         const audioUrl = URL.createObjectURL(audioBlob);
         return audioUrl;

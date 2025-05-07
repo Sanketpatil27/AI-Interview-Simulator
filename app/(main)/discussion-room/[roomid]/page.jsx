@@ -33,6 +33,7 @@ function DiscussRoom() {
     const [transcribe, setTranscribe] = useState('');
     const [loading, setLoading] = useState(false);
     const [audioUrl, setAudioUrl] = useState()
+    const [enableFeedbackNotes, setEnableFeedbackNotes] = useState(false)
     const UpdateConversation = useMutation(api.DiscussionRoom.UpdateConversation)
     const [conversation, setConversation] = useState([{
         role: 'assistant',
@@ -66,24 +67,50 @@ function DiscussRoom() {
             // console.log(transcript);
             let msg = '';
 
+            // if (transcript.message_type === 'FinalTranscript') {
+            //     setConversation(prev => [...prev, {
+            //         role: 'user',
+            //         content: transcript.text,
+            //     }]);
+
+            //     // Calling AI text model to get response
+            //     const lastTwoMsg = conversation.slice(-2)
+            //     // console.log(`LLLLLastttt, ${lastTwoMsg}`);
+
+            //     const aiResp = await AIModel(
+            //         DiscussionRoomData.topic,
+            //         DiscussionRoomData.coachingOption,
+            //         lastTwoMsg
+            //     )
+
+            //     const url = await ConvertTextToSpeech(aiResp.content, DiscussionRoomData.expertName);
+            //     console.log("url: ", url);
+            //     setAudioUrl(url);
+            //     setConversation(prev => [...prev, aiResp])
+            // }
+
+            // updated by gemini to keep the same conversation going on
             if (transcript.message_type === 'FinalTranscript') {
-                setConversation(prev => [...prev, {
+                const userMessage = {
                     role: 'user',
                     content: transcript.text,
-                }]);
-
+                };
+                setConversation(prev => [...prev, userMessage]);
+        
                 // Calling AI text model to get response
-                const lastTwoMsg = conversation.slice(-2)
+                const updatedConversation = [...conversation, userMessage]; // Use the updated conversation
+                const lastTwoMsg = updatedConversation.slice(-2);
                 const aiResp = await AIModel(
                     DiscussionRoomData.topic,
                     DiscussionRoomData.coachingOption,
                     lastTwoMsg
-                )
-
+                );
+        
                 const url = await ConvertTextToSpeech(aiResp.content, DiscussionRoomData.expertName);
                 console.log("url: ", url);
                 setAudioUrl(url);
-                setConversation(prev => [...prev, aiResp])
+                setConversation(prev => [...prev, aiResp]);
+                console.log("conversation: ", conversation);
             }
 
             texts[transcript.audio_start] = transcript?.text;
@@ -155,7 +182,9 @@ function DiscussRoom() {
             id: DiscussionRoomData._id,
             conversation: conversation
         })
+
         setLoading(false);
+        setEnableFeedbackNotes(true);
     }
 
     return (
@@ -189,7 +218,11 @@ function DiscussRoom() {
                 </div>
 
                 <div>
-                    <ChatBox conversation={conversation} />
+                    <ChatBox 
+                        conversation={conversation} 
+                        enableFeedbackNotes={enableFeedbackNotes}
+                        coachingOption={DiscussionRoomData?.coachingOption}
+                    />
                 </div>
             </div>
 

@@ -33,7 +33,7 @@ export const CoachingOptions = [
         name: 'Mock Interview',
         icon: '/interview.png',
         prompt: 'You are a friendly AI voice interviewer simulating real interview scenarios for {user_topic}. Keep responses clear and concise. Ask structured, industry-relevant questions and provide constructive feedback to help users improve. Ensure responses stay under 120 characters.',
-        summeryPrompt: 'As per conversation give feedback to user along with where is improvment space depends in well structure',
+        summeryPrompt: 'You are an expert interviewer. Based on the full conversation, provide constructive feedback to the user. Point out strengths and specific areas for improvement. Structure your feedback in clear bullet points.',
         abstract: '/ab2.png'
 
     },
