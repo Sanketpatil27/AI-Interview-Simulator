@@ -13,6 +13,7 @@ import Image from 'next/image';
 import { useParams } from 'next/navigation'
 import React, { useEffect, useRef, useState } from 'react'
 import ChatBox from './_components/ChatBox';
+import { toast } from 'sonner';
 // const RecordRTC = dynamic(() => import("recordrtc"), { ssr: false });
 let RecordRTC;
 if (typeof window !== "undefined") {
@@ -127,7 +128,9 @@ function DiscussRoom() {
         })
 
         await realtimeTranscriber.current.connect();
+        // setEnableMice
         setLoading(false);
+        toast("connected...");
 
         if (typeof window !== "undefined" && typeof navigator !== "undefined") {
 
@@ -177,6 +180,8 @@ function DiscussRoom() {
         recorder.current.pauseRecording();
         recorder.current = null;
         setEnableMic(false);
+
+        toast("disconnected!");
 
         await UpdateConversation({
             id: DiscussionRoomData._id,

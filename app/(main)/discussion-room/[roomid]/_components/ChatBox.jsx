@@ -6,6 +6,7 @@ import { useMutation } from 'convex/react';
 import { LoaderCircle } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import React, { useState } from 'react'
+import { toast } from 'sonner';
 
 function ChatBox({ conversation, enableFeedbackNotes, coachingOption }) {
 
@@ -25,9 +26,13 @@ function ChatBox({ conversation, enableFeedbackNotes, coachingOption }) {
                 id: roomid,
                 summery: result.content
             })
+
+            setLoading(false);
+            toast('Feedback Saved!');
         }
         catch(e) {
             setLoading(false);
+            toast('Internal Server error, try again after some time!');
             console.log("feedback error: ", e);
         }
     }
@@ -36,7 +41,7 @@ function ChatBox({ conversation, enableFeedbackNotes, coachingOption }) {
         <div>
             <div className='h-[60vh] bg-secondary border rounded-xl flex flex-col relative p-4 overflow-auto scrollbar-hide'>
                 {conversation.map((item, index) => (
-                    <div className={`flex ${item.role == 'user' && 'justify-end'}`}>
+                    <div key={index} className={`flex ${item.role == 'user' && 'justify-end'}`}>
                         {/* <h2> */}
                         {item?.role == 'assistant'
                             ? <h2 className='p-1 px-2 bg-primary mt-2 text-white inline-block rounded-md'> {item?.content} </h2>
@@ -46,7 +51,8 @@ function ChatBox({ conversation, enableFeedbackNotes, coachingOption }) {
                     </div>
                 ))}
             </div>
-            {!enableFeedbackNotes ? <h2 className='mt-4 text-gray-400 text-sm'> At the end of your conversion we will automatically generate feedback from your conversation </h2>
+            {!enableFeedbackNotes ? 
+                <h2 className='mt-4 text-gray-400 text-sm'>  </h2>
                 : <Button onClick={GenerateFeedbackNotes} disabled={loading} className={'mt-7 w-full'}>
                     {loading && <LoaderCircle className='animate-spin' />} Generate Feedback
                 </Button>

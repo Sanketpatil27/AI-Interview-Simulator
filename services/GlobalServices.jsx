@@ -29,7 +29,7 @@ export const AIModel = async (topic, coachingOption, lastTwoConversation) => {
     const completion = await openai.chat.completions.create({
         model: "google/gemma-3-1b-it:free",
         messages: [
-            { role: 'assistant', content: PROMPT },
+            { role: 'user', content: PROMPT },
             ...lastTwoConversation
         ],
     })
@@ -77,7 +77,6 @@ export const AIModelToGenerateFeedbackAndNotes = async (coachingOption, conversa
         ],
     })
 
-    // 3.24.000 ------------------------
 
     console.log("completion[0]: ", completion.choices[0].message)
     return completion?.choices[0].message;
