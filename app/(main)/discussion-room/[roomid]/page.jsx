@@ -15,6 +15,7 @@ import React, { useContext, useEffect, useRef, useState } from 'react'
 import ChatBox from './_components/ChatBox';
 import { toast } from 'sonner';
 import { UserContext } from '@/app/_context/UserContext';
+import Webcam from 'react-webcam';
 // const RecordRTC = dynamic(() => import("recordrtc"), { ssr: false });
 let RecordRTC;
 if (typeof window !== "undefined") {
@@ -229,8 +230,11 @@ function DiscussRoom() {
                         <h2 className='text-gray-500'> {expert?.name} </h2>
                         <audio src={audioUrl} type="audio/mp3" autoPlay />
 
-                        <div className='p-4 bg-gray-200 px-10 rounded-lg absolute bottom-10 right-10'>
+                        {/* <div className='p-4 bg-gray-200 px-10 rounded-lg absolute bottom-10 right-10'>
                             <UserButton />
+                        </div> */}
+                        <div className='absolute bottom-10 right-10'>
+                            <Webcam height={80} width={130} className='rounded-2xl'/>
                         </div>
                     </div>
 
