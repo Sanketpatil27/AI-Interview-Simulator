@@ -11,9 +11,10 @@ import { Loader2Icon } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useParams } from 'next/navigation'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import ChatBox from './_components/ChatBox';
 import { toast } from 'sonner';
+import { UserContext } from '@/app/_context/UserContext';
 // const RecordRTC = dynamic(() => import("recordrtc"), { ssr: false });
 let RecordRTC;
 if (typeof window !== "undefined") {
@@ -26,6 +27,7 @@ if (typeof window !== "undefined") {
 
 function DiscussRoom() {
     const { roomid } = useParams();
+    const {userData, setUserData} = useContext(UserContext);
     const DiscussionRoomData = useQuery(api.DiscussionRoom.GetDiscussionRoom, { id: roomid })
     const [expert, setExpert] = useState();
     const [enableMic, setEnableMic] = useState(false);
@@ -36,6 +38,7 @@ function DiscussRoom() {
     const [audioUrl, setAudioUrl] = useState()
     const [enableFeedbackNotes, setEnableFeedbackNotes] = useState(false)
     const UpdateConversation = useMutation(api.DiscussionRoom.UpdateConversation)
+    const updateUserToken = useMutation(api.users.UpdateUserToken);
     const [conversation, setConversation] = useState([{
         role: 'assistant',
         content: "Hi",
@@ -96,6 +99,9 @@ function DiscussRoom() {
                     role: 'user',
                     content: transcript.text,
                 };
+                
+                await updateUserTokenMethod(transcribe.text)
+
                 setConversation(prev => [...prev, userMessage]);
         
                 // Calling AI text model to get response
@@ -112,6 +118,8 @@ function DiscussRoom() {
                 setAudioUrl(url);
                 setConversation(prev => [...prev, aiResp]);
                 console.log("conversation: ", conversation);
+                
+                await updateUserTokenMethod(aiResp.content);    // Update AI generated TOKEN
             }
 
             texts[transcript.audio_start] = transcript?.text;
@@ -190,6 +198,21 @@ function DiscussRoom() {
 
         setLoading(false);
         setEnableFeedbackNotes(true);
+    }
+
+    // 4.17.07
+    
+    const updateUserTokenMethod = async (text) => {
+        const tokenCount = text?.trim() ? text?.trim().split(/\s+/).length : 0
+        const result = await updateUserToken({
+            id: userData._id,
+            credits: Number(userData.credits)-Number(tokenCount)
+        })
+
+        setUserData(prev => ({
+            ...prev, 
+            credits: Number(userData.credits)-Number(tokenCount)
+        }))
     }
 
     return (

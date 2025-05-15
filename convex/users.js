@@ -6,14 +6,14 @@ export const CreateUser = mutation({
         name: v.string(),
         email: v.string()
     },
-    handler: async(ctx, args) => {
+    handler: async (ctx, args) => {
         // if user exist
         const userData = await ctx.db.query('users')
-        .filter(q=>q.eq(q.field('email'), args.email))
-        .collect()
+            .filter(q => q.eq(q.field('email'), args.email))
+            .collect()
 
         // if not then addd new user
-        if(userData?.length == 0) {
+        if (userData?.length == 0) {
             const data = {
                 name: args.name,
                 email: args.email,
@@ -27,5 +27,17 @@ export const CreateUser = mutation({
         }
 
         return userData[0]
+    }
+})
+
+export const UpdateUserToken = mutation({
+    args: {
+        id: v.id('users'),
+        credits: v.number()
+    },
+    handler: async (ctx, args) => {
+        await ctx.db.patch(args.id, {
+            credits: args.credits
+        })
     }
 })
