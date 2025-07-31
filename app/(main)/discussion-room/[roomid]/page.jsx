@@ -40,13 +40,7 @@ function DiscussRoom() {
     const [enableFeedbackNotes, setEnableFeedbackNotes] = useState(false)
     const UpdateConversation = useMutation(api.DiscussionRoom.UpdateConversation)
     const updateUserToken = useMutation(api.users.UpdateUserToken);
-    const [conversation, setConversation] = useState([{
-        role: 'assistant',
-        content: "Hi",
-    }, {
-        role: 'user',
-        content: 'Hello'
-    }]);
+    const [conversation, setConversation] = useState([]);
     let silenceTimeout;
     let texts = {};
 

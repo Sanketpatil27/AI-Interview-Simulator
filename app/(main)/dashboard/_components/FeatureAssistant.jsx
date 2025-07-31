@@ -1,43 +1,55 @@
 "use client"
 
-import { BlurFade } from '@/components/magicui/blur-fade';
-import { Button } from '@/components/ui/button';
-import { CoachingOptions } from '@/services/Options';
+import { BlurFade } from '@/components/magicui/blur-fade'
+import { Button } from '@/components/ui/button'
+import { CoachingOptions } from '@/services/Options'
 import { useUser } from '@stackframe/stack'
-import Image from 'next/image';
+import Image from 'next/image'
 import React from 'react'
-import UserInputDialog from './UserInputDialog';
-import ProfileDialog from './ProfileDialog';
+import UserInputDialog from './UserInputDialog'
+import ProfileDialog from './ProfileDialog'
 
 function FeatureAssistant() {
-    const user = useUser();
+    const user = useUser()
 
     return (
-        <div>
-            <div className='flex justify-between items-center'>
-
+        <div className="space-y-10">
+            {/* Header */}
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                 <div>
-                    <h2 className='font-medium text-gray-500'>My Workspace</h2>
-                    <h2 className='text-3xl font-bold'>Welcome back, {user?.displayName}</h2>
+                    <h2 className="text-sm text-muted-foreground">My Workspace</h2>
+                    <h1 className="text-4xl font-extrabold text-slate-900 dark:text-white">
+                        Welcome back, {user?.displayName?.split(' ')[0] ?? 'there'} 👋
+                    </h1>
                 </div>
 
                 <ProfileDialog>
-                    <Button>Profile</Button>
+                    <Button variant="outline" className="rounded-full px-6 py-2">
+                        Profile
+                    </Button>
                 </ProfileDialog>
             </div>
 
-            <div className='grid grid-cols-2 lg:grid-cols-5 xl:grid-cols-5 gap-10 mt-10'>
+            {/* Coaching Options */}
+            {/* <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6"> */}
+            <div className="gap-6">
                 {CoachingOptions.map((option, index) => (
                     <BlurFade key={option.icon} delay={0.25 + index * 0.05} inView>
-                        <div key={index} className='p-3 bg-secondary rounded-3xl flex flex-col justify-center items-center'>
+                        <div className="relative group cursor-pointer transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl bg-white/60 dark:bg-zinc-800/60 backdrop-blur-lg border border-gray-200 dark:border-zinc-700 rounded-xl p-5 h-[180px] flex flex-col items-center justify-center">
                             <UserInputDialog coachingOption={option}>
-                                <div key={index} className='flex flex-col justify-center items-center'>
-                                    <Image src={option.icon} alt={option.name}
-                                        width={150}
-                                        height={150}
-                                        className='h-[70px] w-[70px] cursor-pointer hover:rotate-12 transition-all'
-                                    />
-                                    <h2 className='mt-2'>{option.name}</h2>
+                                <div className="flex flex-col items-center text-center space-y-3">
+                                    <div className="w-16 h-16 rounded-full bg-white/80 dark:bg-zinc-700/50 flex items-center justify-center shadow-md group-hover:scale-105 transition-transform duration-300">
+                                        <Image
+                                            src={option.icon}
+                                            alt={option.name}
+                                            width={40}
+                                            height={40}
+                                            className="transition-transform duration-300 group-hover:rotate-12"
+                                        />
+                                    </div>
+                                    <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+                                        {option.name}
+                                    </h3>
                                 </div>
                             </UserInputDialog>
                         </div>
